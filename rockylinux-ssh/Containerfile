@@ -1,0 +1,21 @@
+FROM rockylinux:latest
+
+# install top
+RUN dnf install procps -y
+
+# create users and set passwords
+RUN dnf install passwd -y
+COPY adduser.sh /root/adduser.sh
+RUN chmod 700 /root/adduser.sh
+RUN /root/adduser.sh root,root
+RUN rm -f /root/adduser.sh
+RUN dnf remove passwd -y
+
+# install sshd and enable
+RUN dnf install openssh-server -y; systemctl enable sshd
+EXPOSE 22
+
+# clean dnf cache
+RUN dnf clean all
+
+CMD /sbin/init
